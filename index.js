@@ -94,104 +94,211 @@ class BinarySearchTree{
 
     //loop through as long as currentNode is not null
     while(currentNode !== null){
+      
       //if input value is less than current nodes value {traverse parentNode to currentNode, and currentNode to left}
       if(value < currentNode.value){
         parentNode = currentNode;
         currentNode = currentNode.left;
+        
       //else if input value is greater than current nodes value {traverse parentNode to currentNode, and currentNode to right}
       }else if(value > currentNode.value){
         parentNode = currentNode;
         currentNode = currentNode.right;
-      }else if(value === currentNode.value){
-        //There's a match:
-        //option 1: if currentNode has no right child
-        if(currentNode.right === null){
-          //if root is chosen for removal {assign currentNode.left to root}
-          if(parentNode === null){
-            this.root = currentNode.left;
+        
+      //There's a match and the input value is equal to the currenNodes value:
+      }else{
+        if(value === currentNode.value)
+          
+          //option 1: if currentNode has no right child
+          if(currentNode.right === null){
+            //if root is chosen for removal {assign currentNode.left to root}
+            if(parentNode === null){
+              this.root = currentNode.left;
+            }else{
+              //if parentNode > current nodes value {assign currentNodes left value to parentNodes left pointer}
+              if(parentNode.value > currentNode.value){
+                parentNode.left = currentNode.left;
+              //else, parentNode < current nodes value, {assign currentNodes left value to parentNodes right pointer}
+              }else{ 
+                if(parentNode.value < currentNode.value)
+                parentNode.right = currentNode.left;
+              }
+            }
+            
+          //option 2: currentNodes right child doesn't have a left child
+          //else if currentNodes right then left value is null {assign currentNode's left value to it}
+          }else if(currentNode.right.left === null){
+            currentNode.right.left = currentNode.left;
+            //if root is chosen for removal {assign currentNodes right value to root}
+            if(parentNode === null){
+              this.root = currentNode.right;
+            //else, parentNode > current nodes value {assign currentNodes right value to parentNodes left pointer}
+            }else{
+              if(parentNode.value > currentNode.value){
+                parentNode.left = currentNode.right;
+              //or if parentNode < current nodes value, assign currentNodes right value to parentNodes right pointer
+              }else{ 
+                if(parentNode.value < currentNode.value)
+                parentNode.right = currentNode.right;
+              }
+            }
+            
+          //option 3: currentNodes right child, has a left child
           }else{
-            //if parentNode > current nodes value {assign currentNodes left value to parentNodes left pointer}
-            if(parentNode.value > currentNode.value){
-              parentNode.left = currentNode.left;
-            //else if parentNode < current nodes value, {assign currentNodes left value to parentNodes right pointer}
-            }else if(parentNode.value < currentNode.value){
-              parentNode.right = currentNode.left;
+            //find the right child's left most child
+            //assign leftMost to currentNodes right, left value
+            let leftMost = currentNode.right.left;
+            //assign leftMostParent to currentNodes right value
+            let leftMostParent = currentNode.right;
+            //as long as the leftMost's left value is not null
+            while(leftMost.left !== null){
+              //traverse leftMostParent to leftMost and leftMost to leftMost's left value
+              leftMostParent = leftMost;
+              leftMost = leftMost.left;
+            }
+            //assign leftMost's right values to the leftMostParents left pointer (LMP gets the subtree of LM's right)
+            leftMostParent.left = leftMost.right;
+            //assign leftMost left pointer to currentNodes left value (LM takes the place of currentNode)
+            leftMost.left = currentNode.left;
+            //assign leftMost right pointer to currentNodes right value (LM takes the place of currentNode)
+            leftMost.right = currentNode.right;
+            //if root is chosen for removal {assing leftMost to root}
+            if(parentNode === null){
+              this.root = leftMost;
+            //otherwise, if currentNode value is less than parent node value {assign leftMost to parentNode left}
+            }else{
+              if(currentNode.value < parentNode.value){
+                parentNode.left = leftMost;
+              //otherwise, if currentNode value is greater than parent node value {assign leftMost to parentNode right}
+              }else{ 
+                if(currentNode.value > parentNode.value)
+                parentNode.right = leftMost;
+              }
             }
           }
-        //option 2: currentNodes right child doesn't have a left child
-        //else if currentNodes right then left value is null {assign currentNode's left value to it}
-        }else if(currentNode.right.left === null){
-          currentNode.right.left = currentNode.left;
-          //if root is chosen for removal {assign currentNodes right value to root}
-          if(parentNode === null){
-            this.root = currentNode.right;
-          //else, parentNode > current nodes value {assign currentNodes right value to parentNodes left pointer}
-          }else{
-            if(parentNode.value > currentNode.value){
-              parentNode.left = currentNode.right;
-            //or if parentNode < current nodes value, assign currentNodes right value to parentNodes right pointer
-            }else if(parentNode.value < currentNode.value){
-              parentNode.right = currentNode.right;
-            }
-          }
-        //option 3: currentNodes right child, has a left child
-        }else{
-          //find the right child's left most child
-          //assign leftMost to currentNodes right, left value
-          let leftMost = currentNode.right.left;
-          //assign leftMostParent to currentNodes right value
-          let leftMostParent = currentNode.right;
-          //as long as the leftMost's left value is not null
-          while(leftMost.left !== null){
-            //traverse leftMostParent to leftMost and leftMost to leftMost's left value
-            leftMostParent = leftMost;
-            leftMost = leftMost.left;
-          }
-          //assign leftMost's right values to the leftMostParents left pointer (LMP gets the subtree of LM's right)
-          leftMostParent.left = leftMost.right;
-          //assign leftMost left pointer to currentNodes left value (LM takes the place of currentNode)
-          leftMost.left = currentNode.left;
-          //assign leftMost right pointer to currentNodes right value (LM takes the place of currentNode)
-          leftMost.right = currentNode.right;
-          //if root is chosen for removal {assing leftMost to root}
-          if(parentNode === null){
-            this.root = leftMost;
-          //otherwise, if currentNode value is less than parent node value {assign leftMost to parentNode left}
-          }else{
-            if(currentNode.value < parentNode.value){
-              parentNode.left = leftMost;
-            //otherwise, if currentNode value is greater than parent node value {assign leftMost to parentNode right}
-            }else if(currentNode.value > parentNode.value){
-              parentNode.right = leftMost;
-            }
-          }
-        }
-        //move out of option 3 else statement, set currentNodes left/right to null, and return true if removed
-        currentNode.left = null;
-        currentNode.right = null;
-        return currentNode;
+          
+          //move out of option 3 else statement, set currentNodes left/right to null, and return true if removed
+          currentNode.left = null;
+          currentNode.right = null;
+          return true;
       }
+      //move out of it's a match block: if currentNode does not exist, return false
+      return false;
     }
   }
-    
 
-  printListArray(){
+  //traverses the tree via Breadth First Search
+  BFS(){
+    //create an empty array to hold the values visited; this will be returned at the end of the method
+    //create an empty array ("a queue", FIFO) to temporarily store the values visited
+    const array = [], queue = [];
+    //create a variable that starts at the root
+    let node = this.root;
+    //push the first node (root) into the queue
+    queue.push(node);
+    //while the queues length is true (not 0), keep looping
+    while(queue.length){
+      //take the first node out of the queue
+      node = queue.shift();
+      //push that node's value into the array
+      array.push(node.value);
+      //if that node has a left value {push it into the queue}
+      if(node.left) queue.push(node.left);
+      //if that node has a right value {push it into the queue}
+      if(node.right) queue.push(node.right);
+    }
+    //return the array to see all the values
+    return array;
+  }
+
+  //traverses the tree recursively: visiting the first node (pushes to array), traverses the left side, then traverses the right side
+  DFSPreOrder(){
+    //create an empty array to hold the values visited; this will be returned at the end of the method
     const array = [];
+    //create a variable that starts at the root
+    let current = this.root;
+    //create a helper function that accepts a node (recursive function)
+    function traverse(helperNode){
+      //push the value of that node to the array
+      array.push(helperNode.value);
+      //if the node has a left property {use the helper function to traverse the left side}
+      if(helperNode.left) traverse(helperNode.left);
+      //if the node has a right property {use the helper function to traverse the right side}
+      if(helperNode.right) traverse(helperNode.right);
+    }
+    //call the helper function on the root to start the process
+    traverse(current);
+    //return the array to see all the values
+    return array;
+  }
+
+  //traverses the tree recursively: traverses the left and right side first, then visits the node (pushes to array)
+  DFSPostOrder(){
+    //create an empty array to hold the values visited; this will be returned at the end of the method
+    const array = [];
+    //create a variable that starts at the root
+    let current = this.root;
+    //create a helper function that accepts a node (recursive function)
+    function traverse(helperNode){
+      //if the node has a left property {use the helper function to traverse the left side}
+      if(helperNode.left) traverse(helperNode.left);
+      //if the node has a right property {use the helper function to traverse the right side}
+      if(helperNode.right) traverse(helperNode.right);
+      //push the value of that node to the array
+      array.push(helperNode.value);
+    }
+    //call the helper function on the root to start the process
+    traverse(current);
+    //return the array to see all the values
+    return array;
+  }
+
+  //traverses the tree recursively: traverses the entire left side, then visits the node (pushes to array), and then traverses the entire right side
+  DFSInOrder(){
+    //create an empty array to hold the values visited; this will be returned at the end of the method
+    const array = [];
+    //create a variable that starts at the root
+    let current = this.root;
+    //create a helper function that accepts a node (recursive function)
+    function traverse(helperNode){
+      //if the node has a left property {use the helper function to traverse the left side}
+      if(helperNode.left) traverse(helperNode.left);
+      //push the value of that node to the array
+      array.push(helperNode.value);
+      //if the node has a right property {use the helper function to traverse the right side}
+      if(helperNode.right) traverse(helperNode.right);
+    }
+    //call the helper function on the root to start the process
+    traverse(current);
+    //return the array to see all the values
+    return array;
+  }
+    
+  //prints an array to the console; also is BFS
+  printListArray(){
+    //create an empty array to hold the values visited; this will be returned at the end of the method
+    const array = [];
+    //create an empty array ("a queue", FIFO) to temporarily store the values visited
     const q = [];
+    //start at the root and put it inside the queue
     q.push(this.root);
+    //loop while there is something inside the queue (the queue length is not zero)
     while(q.length !== 0){
+      //grab the current queues length in a variable
       const currentQueueSize = q.length;
+      //loop through the current queue's length
       for(let i=0; i < currentQueueSize; i++){
+        //grab the first node in the list
         const node = q.shift();
-        if(node.left !== null){
-          q.push(node.left);
-        }
-        if(node.right !== null){
-          q.push(node.right);
-        }
+        //if it has a left value {push it to the queue}
+        if(node.left !== null) q.push(node.left);
+        //if it has a right value {push it to the queue}
+        if(node.right !== null) q.push(node.right);
+        //push the node into the array
         array.push(node.value);
       }
     }
+    //return the array
     return array;
   }
   
@@ -207,9 +314,21 @@ tree.insert(16);
 tree.insert(7);
 tree.insert(6);
 tree.insert(15);
+
+// tree.insert(6);
+// tree.insert(15);
+// tree.insert(20);
+// tree.insert(8);
+// tree.insert(3);
 // tree.insert(10);  //should return undefined because value is already in tree
 // console.log(tree.find(10));
-console.log(tree.remove(10));
+// console.log(tree.remove(100));
 
-console.log(tree);
-console.log(tree.printListArray());
+// console.log("BFS:", tree.BFS());
+// console.log("DFSPreOrder:", tree.DFSPreOrder());
+// tree.DFSPreOrder(); //call method and add breakpoint to line to step through debugger and look at call stack
+// console.log("DFSPostOrder:", tree.DFSPostOrder());
+// console.log("DFSInOrder:", tree.DFSInOrder());
+
+// console.log(tree);
+// console.log(tree.printListArray());
