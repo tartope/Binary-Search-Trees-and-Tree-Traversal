@@ -116,11 +116,11 @@ class BinarySearchTree{
               this.root = currentNode.left;
             }else{
               //if parentNode > current nodes value {assign currentNodes left value to parentNodes left pointer}
-              if(parentNode.value > currentNode.value){
+              if(currentNode.value < parentNode.value){
                 parentNode.left = currentNode.left;
               //else, parentNode < current nodes value, {assign currentNodes left value to parentNodes right pointer}
               }else{ 
-                if(parentNode.value < currentNode.value)
+                if(currentNode.value > parentNode.value)
                 parentNode.right = currentNode.left;
               }
             }
@@ -134,11 +134,11 @@ class BinarySearchTree{
               this.root = currentNode.right;
             //else, parentNode > current nodes value {assign currentNodes right value to parentNodes left pointer}
             }else{
-              if(parentNode.value > currentNode.value){
+              if(currentNode.value < parentNode.value){
                 parentNode.left = currentNode.right;
               //or if parentNode < current nodes value, assign currentNodes right value to parentNodes right pointer
               }else{ 
-                if(parentNode.value < currentNode.value)
+                if(currentNode.value > parentNode.value)
                 parentNode.right = currentNode.right;
               }
             }
@@ -183,7 +183,100 @@ class BinarySearchTree{
           return true;
       }
       //move out of it's a match block: if currentNode does not exist, return false
-      return false;
+      // return false;
+    }
+  }
+
+  //my version of remove
+  //deletes a node of a given value
+  delete(value){
+    //if tree is empty, return false
+    if(this.root === null) return false;
+    //start current at root
+    let current = this.root;
+    //start parent to current at null
+    let parent = null;
+    //while current is not null
+    while(current !== null){ 
+      //if input value less than current value {traverse parent>current>current.left}
+      if(value < current.value){
+        parent = current;
+        current = current.left;
+      //else if, input value greater than current value {traverse parent>current>current.right}
+      }else if(value > current.value){
+        parent = current;
+        current = current.right;
+      //else, input value and current value match
+      }else{
+        if(value === current.value){
+          //option 1 (current node has no right node):
+          //if current has no right node
+          if(current.right === null){
+            //if root chosen for removal {set current.left to root}
+            if(parent === null){
+              this.root = current.left;
+            
+            }else{
+              //else if, current value less than parent value {set current.left to parent.left}
+              if(current.value < parent.value){
+                parent.left = current.left;
+              }else{
+                //else, current value greater than parent value {set current.left to parent.right}
+                parent.right = current.left;
+              }
+            }
+          //option 2 (current's right node does not have left node):
+          //else if, current's right's left is null{set current's right's left to current.left}
+          }else if(current.right.left === null){
+            current.right.left = current.left;
+            //if root chosen for removal {set current.right to root}
+            if(parent === null){
+              this.root = current.right;
+            //else if, current value less than parent value {set current.right to parent.left}
+            }else{
+              if(current.value < parent.value){
+                parent.left = current.right;
+              //else, current value greater than parent value {set current.right to parent.right}
+              }else{
+                parent.right = current.right;
+              }
+            }
+          //option 3 (current's right node has a left node)
+          }else{
+              //create variable for minimum value at right
+              let minRight = current.right.left;
+              //create variable for minimums parent
+              let minRightParent = current.right;
+              //while minRights's left exists {traverse minRightarent>minRight>minRight.left}
+              while(minRight.left !== null){
+                minRightParent = minRight;
+                minRight = minRight.left;
+              }
+              //set minRight.right property to minParent.left
+              minRightParent.left = minRight.right;
+              //set current.left to minRight.left
+              minRight.left = current.left;
+              //set current.right to minRight.right
+              minRight.right = current.right;
+              //if root chosen for removeal {set minRight to root}
+              if(parent === null){
+                this.root = minRight;
+              }else{
+                //else, if current value less than parent value {set minRight to parent.left}
+                if(current.value < parent.value){
+                  parent.left = minRight;
+                }else{
+                  //else, current value greater than parent value {set minRight to parent.right}
+                  parent.right = minRight;
+                }
+              }
+            }  
+          //move out of option 3 else block, set currentNodes left/right to null, and return true if removed
+          current.left = null;
+          current.right = null;
+          return true;
+        }
+      }
     }
   }
 
@@ -322,7 +415,8 @@ tree.insert(15);
 // tree.insert(3);
 // tree.insert(10);  //should return undefined because value is already in tree
 // console.log(tree.find(10));
-// console.log(tree.remove(100));
+// console.log(tree.remove(10));
+console.log(tree.delete(16));  //my version of remove
 
 // console.log("BFS:", tree.BFS());
 // console.log("DFSPreOrder:", tree.DFSPreOrder());
@@ -331,4 +425,4 @@ tree.insert(15);
 // console.log("DFSInOrder:", tree.DFSInOrder());
 
 // console.log(tree);
-// console.log(tree.printListArray());
+console.log(tree.printListArray());
